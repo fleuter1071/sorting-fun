@@ -72,6 +72,7 @@ function App() {
   const [items, setItems] = useState(loadSavedItems);
   const [dragState, setDragState] = useState(null);
   const [activeTarget, setActiveTarget] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState({
     title: "",
     source: "",
@@ -157,6 +158,7 @@ function App() {
 
   function resetBoard() {
     setItems(initialRequests);
+    setEditingId(null);
     setDraft({
       title: "",
       source: "",
@@ -184,19 +186,59 @@ function App() {
       return;
     }
 
-    setItems((current) => [
-      {
-        id: createRequestId(),
-        title,
-        source,
-        priority: null,
-      },
-      ...current,
-    ]);
+    if (editingId) {
+      setItems((current) =>
+        current.map((item) =>
+          item.id === editingId
+            ? {
+                ...item,
+                title,
+                source,
+              }
+            : item
+        )
+      );
+      setEditingId(null);
+    } else {
+      setItems((current) => [
+        {
+          id: createRequestId(),
+          title,
+          source,
+          priority: null,
+        },
+        ...current,
+      ]);
+    }
+
     setDraft({
       title: "",
       source: "",
     });
+  }
+
+  function startEditing(item) {
+    setEditingId(item.id);
+    setDraft({
+      title: item.title,
+      source: item.source,
+    });
+  }
+
+  function cancelEditing() {
+    setEditingId(null);
+    setDraft({
+      title: "",
+      source: "",
+    });
+  }
+
+  function deleteRequest(itemId) {
+    setItems((current) => current.filter((item) => item.id !== itemId));
+
+    if (editingId === itemId) {
+      cancelEditing();
+    }
   }
 
   return (
@@ -238,9 +280,13 @@ function App() {
 
             <form className="composer" onSubmit={handleCreateRequest}>
               <div className="composer-copy">
-                <p className="composer-title">Add a new request</p>
+                <p className="composer-title">
+                  {editingId ? "Edit request" : "Add a new request"}
+                </p>
                 <p className="composer-subtle">
-                  Capture incoming work before you sort it.
+                  {editingId
+                    ? "Update the note, then save it back to the board."
+                    : "Capture incoming work before you sort it."}
                 </p>
               </div>
 
@@ -266,9 +312,20 @@ function App() {
                 />
               </label>
 
-              <button type="submit" className="primary-button">
-                Add request
-              </button>
+              <div className="composer-actions">
+                <button type="submit" className="primary-button">
+                  {editingId ? "Save changes" : "Add request"}
+                </button>
+                {editingId ? (
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={cancelEditing}
+                  >
+                    Cancel
+                  </button>
+                ) : null}
+              </div>
             </form>
 
             <div className="incoming-stack" aria-live="polite">
@@ -286,6 +343,8 @@ function App() {
                       transform: `rotate(${stackTilts[index % stackTilts.length]}deg)`,
                     }}
                     onPointerDown={(event) => startDrag(event, item)}
+                    onEdit={() => startEditing(item)}
+                    onDelete={() => deleteRequest(item.id)}
                   />
                 );
               })}
@@ -336,6 +395,8 @@ function App() {
                             zIndex: index + 1,
                           }}
                           onPointerDown={(event) => startDrag(event, item)}
+                          onEdit={() => startEditing(item)}
+                          onDelete={() => deleteRequest(item.id)}
                         />
                       );
                     })}
@@ -379,6 +440,7 @@ function App() {
               item={dragState.item}
               tone={noteTone(dragState.item.priority)}
               className="proxy-card"
+              showActions={false}
             />
           </div>
         ) : null}
@@ -426,7 +488,16 @@ function createRequestId() {
   return `req-${crypto.randomUUID()}`;
 }
 
-function NoteCard({ item, tone, className = "", style, onPointerDown }) {
+function NoteCard({
+  item,
+  tone,
+  className = "",
+  style,
+  onPointerDown,
+  onEdit,
+  onDelete,
+  showActions = true,
+}) {
   return (
     <button
       type="button"
@@ -436,6 +507,34 @@ function NoteCard({ item, tone, className = "", style, onPointerDown }) {
       onPointerDown={onPointerDown}
     >
       <span className="note-pin"></span>
+      {showActions ? (
+        <span className="note-actions">
+          <button
+            type="button"
+            className="note-action-button"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              onEdit?.();
+            }}
+            aria-label={`Edit ${item.title}`}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            className="note-action-button note-action-button-delete"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete?.();
+            }}
+            aria-label={`Delete ${item.title}`}
+          >
+            Delete
+          </button>
+        </span>
+      ) : null}
       <span className="note-title">{item.title}</span>
       <span className="note-meta">{item.source}</span>
     </button>
