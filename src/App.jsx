@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+const storageKey = "sorting-fun-board";
+
 const initialRequests = [
   {
     id: "req-1",
@@ -67,9 +69,13 @@ function noteTone(priority) {
 }
 
 function App() {
-  const [items, setItems] = useState(initialRequests);
+  const [items, setItems] = useState(loadSavedItems);
   const [dragState, setDragState] = useState(null);
   const [activeTarget, setActiveTarget] = useState(null);
+  const [draft, setDraft] = useState({
+    title: "",
+    source: "",
+  });
   const dropzoneRefs = useRef({});
 
   useEffect(() => {
@@ -131,6 +137,10 @@ function App() {
     return () => document.body.classList.remove("dragging");
   }, [dragState]);
 
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, JSON.stringify(items));
+  }, [items]);
+
   const unsorted = items.filter((item) => !item.priority);
 
   function startDrag(event, item) {
@@ -147,8 +157,46 @@ function App() {
 
   function resetBoard() {
     setItems(initialRequests);
+    setDraft({
+      title: "",
+      source: "",
+    });
     setDragState(null);
     setActiveTarget(null);
+  }
+
+  function handleDraftChange(event) {
+    const { name, value } = event.target;
+
+    setDraft((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  function handleCreateRequest(event) {
+    event.preventDefault();
+
+    const title = draft.title.trim();
+    const source = draft.source.trim();
+
+    if (!title || !source) {
+      return;
+    }
+
+    setItems((current) => [
+      {
+        id: createRequestId(),
+        title,
+        source,
+        priority: null,
+      },
+      ...current,
+    ]);
+    setDraft({
+      title: "",
+      source: "",
+    });
   }
 
   return (
@@ -187,6 +235,41 @@ function App() {
               <p className="section-label">Incoming stack</p>
               <p className="section-subtle">New requests waiting for triage</p>
             </div>
+
+            <form className="composer" onSubmit={handleCreateRequest}>
+              <div className="composer-copy">
+                <p className="composer-title">Add a new request</p>
+                <p className="composer-subtle">
+                  Capture incoming work before you sort it.
+                </p>
+              </div>
+
+              <label className="composer-field">
+                <span>Request</span>
+                <input
+                  type="text"
+                  name="title"
+                  value={draft.title}
+                  onChange={handleDraftChange}
+                  placeholder="Ex: Investigate spike in churn"
+                />
+              </label>
+
+              <label className="composer-field">
+                <span>Source</span>
+                <input
+                  type="text"
+                  name="source"
+                  value={draft.source}
+                  onChange={handleDraftChange}
+                  placeholder="Ex: Customer success"
+                />
+              </label>
+
+              <button type="submit" className="primary-button">
+                Add request
+              </button>
+            </form>
 
             <div className="incoming-stack" aria-live="polite">
               {unsorted.map((item, index) => {
@@ -302,6 +385,45 @@ function App() {
       </div>
     </>
   );
+}
+
+function loadSavedItems() {
+  if (typeof window === "undefined") {
+    return initialRequests;
+  }
+
+  try {
+    const saved = window.localStorage.getItem(storageKey);
+
+    if (!saved) {
+      return initialRequests;
+    }
+
+    const parsed = JSON.parse(saved);
+
+    if (!Array.isArray(parsed)) {
+      return initialRequests;
+    }
+
+    return parsed.filter(isValidItem);
+  } catch {
+    return initialRequests;
+  }
+}
+
+function isValidItem(item) {
+  return (
+    item &&
+    typeof item.id === "string" &&
+    typeof item.title === "string" &&
+    typeof item.source === "string" &&
+    (item.priority === null ||
+      priorities.some((priority) => priority.key === item.priority))
+  );
+}
+
+function createRequestId() {
+  return `req-${crypto.randomUUID()}`;
 }
 
 function NoteCard({ item, tone, className = "", style, onPointerDown }) {

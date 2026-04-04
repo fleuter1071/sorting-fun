@@ -57,6 +57,10 @@ button {
   font: inherit;
 }
 
+input {
+  font: inherit;
+}
+
 .page-shell {
   min-height: 100vh;
   padding: 3rem clamp(1.1rem, 2vw, 1.8rem);
@@ -171,6 +175,79 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+.composer {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 250, 242, 0.82);
+  border: 1px solid rgba(122, 82, 54, 0.12);
+  box-shadow: var(--shadow-sm);
+}
+
+.composer-copy {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.composer-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
+.composer-subtle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.composer-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.composer-field span {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(44, 27, 17, 0.65);
+}
+
+.composer-field input {
+  width: 100%;
+  border: 1px solid rgba(86, 53, 31, 0.15);
+  border-radius: 16px;
+  padding: 0.95rem 1rem;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.composer-field input:focus {
+  border-color: rgba(43, 95, 155, 0.45);
+  box-shadow: 0 0 0 4px rgba(43, 95, 155, 0.12);
+}
+
+.primary-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.9rem 1.1rem;
+  background: linear-gradient(135deg, #2d1b11, #5b3823);
+  color: #fffaf2;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  box-shadow: 0 14px 28px rgba(45, 27, 17, 0.2);
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 32px rgba(45, 27, 17, 0.24);
 }
 
 .incoming-stack {
