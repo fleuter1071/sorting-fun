@@ -143,6 +143,10 @@ function App() {
   }, [items]);
 
   const unsorted = items.filter((item) => !item.priority);
+  const topCount = items.filter((item) => item.priority === "top").length;
+  const highCount = items.filter((item) => item.priority === "high").length;
+  const mediumCount = items.filter((item) => item.priority === "medium").length;
+  const lowCount = items.filter((item) => item.priority === "low").length;
 
   function startDrag(event, item) {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -244,52 +248,39 @@ function App() {
   return (
     <>
       <div className="page-shell">
-        <header className="hero">
-          <div className="hero-copy">
+        <header className="workspace-header">
+          <div className="workspace-header-copy">
             <p className="eyebrow">Priority triage prototype</p>
-            <h1>Grab new requests and drop them into the right pile.</h1>
-            <p className="hero-text">
-              A tactile, visual way to sort incoming work into top, high, medium,
-              and low priority. Pick up a note, move it by hand, and place it.
+            <h1>Sorting Fun By Doug</h1>
+            <p className="workspace-header-text">
+              Add a request, then move the note into the pile that best fits urgency
+              and impact.
             </p>
           </div>
-
-          <aside className="hero-panel" aria-label="Prototype guidance">
-            <div className="hero-panel-row">
-              <div>
-                <p className="panel-label">How it works</p>
-                <ol className="how-list">
-                  <li>Pick up a request from the incoming stack.</li>
-                  <li>Move it across the desk.</li>
-                  <li>Drop it into one of the four priority piles.</li>
-                </ol>
-              </div>
-              <button type="button" className="secondary-button" onClick={resetBoard}>
-                Reset board
-              </button>
-            </div>
-          </aside>
+          <button type="button" className="utility-button" onClick={resetBoard}>
+            Reset board
+          </button>
         </header>
 
-        <main className="board" aria-label="Request sorting board">
-          <section className="incoming-zone">
-            <div className="section-heading">
-              <p className="section-label">Incoming stack</p>
-              <p className="section-subtle">New requests waiting for triage</p>
-            </div>
-
-            <form className="composer" onSubmit={handleCreateRequest}>
+        <section className="workspace-band" aria-label="Board controls and summary">
+          <form className="composer" onSubmit={handleCreateRequest}>
+            <div className="composer-head">
               <div className="composer-copy">
+                <p className="composer-kicker">
+                  {editingId ? "Editing note" : "Add request"}
+                </p>
                 <p className="composer-title">
-                  {editingId ? "Edit request" : "Add a new request"}
+                  {editingId ? "Update the request and keep sorting" : "Capture the next piece of work"}
                 </p>
                 <p className="composer-subtle">
                   {editingId
-                    ? "Update the note, then save it back to the board."
-                    : "Capture incoming work before you sort it."}
+                    ? "Save the update, then place the note back into the right pile."
+                    : "Enter the request here. It will appear in the incoming stack ready to sort."}
                 </p>
               </div>
+            </div>
 
+            <div className="composer-fields">
               <label className="composer-field">
                 <span>Request</span>
                 <input
@@ -311,22 +302,64 @@ function App() {
                   placeholder="Ex: Customer success"
                 />
               </label>
+            </div>
 
-              <div className="composer-actions">
-                <button type="submit" className="primary-button">
-                  {editingId ? "Save changes" : "Add request"}
+            <div className="composer-actions">
+              <button type="submit" className="primary-button">
+                {editingId ? "Save changes" : "Add request"}
+              </button>
+              {editingId ? (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={cancelEditing}
+                >
+                  Cancel
                 </button>
-                {editingId ? (
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={cancelEditing}
-                  >
-                    Cancel
-                  </button>
-                ) : null}
-              </div>
-            </form>
+              ) : null}
+            </div>
+          </form>
+
+          <section className="board-summary" aria-label="Board summary">
+            <SummaryCard
+              tone="incoming"
+              label="Waiting to sort"
+              value={unsorted.length}
+              detail="New requests still in the stack"
+            />
+            <SummaryCard
+              tone="top"
+              label="Top priority"
+              value={topCount}
+              detail="Immediate work"
+            />
+            <SummaryCard
+              tone="high"
+              label="High priority"
+              value={highCount}
+              detail="Needs attention soon"
+            />
+            <SummaryCard
+              tone="medium"
+              label="Medium priority"
+              value={mediumCount}
+              detail="Planned work"
+            />
+            <SummaryCard
+              tone="low"
+              label="Low priority"
+              value={lowCount}
+              detail="Backlog ideas"
+            />
+          </section>
+        </section>
+
+        <main className="board" aria-label="Request sorting board">
+          <section className="incoming-zone">
+            <div className="section-heading">
+              <p className="section-label">Incoming stack</p>
+              <p className="section-subtle">New requests waiting for triage</p>
+            </div>
 
             <div className="incoming-stack" aria-live="polite">
               {unsorted.map((item, index) => {
@@ -340,7 +373,7 @@ function App() {
                     className={isDragging ? "dragging-origin" : ""}
                     style={{
                       top: `${20 + index * 86}px`,
-                      transform: `rotate(${stackTilts[index % stackTilts.length]}deg)`,
+                      "--card-rotate": `${stackTilts[index % stackTilts.length]}deg`,
                     }}
                     onPointerDown={(event) => startDrag(event, item)}
                     onEdit={() => startEditing(item)}
@@ -391,7 +424,7 @@ function App() {
                           tone={noteTone(priority.key)}
                           className={`in-pile ${isDragging ? "dragging-origin" : ""}`}
                           style={{
-                            transform: `rotate(${index % 2 === 0 ? "-1.5deg" : "1deg"})`,
+                            "--card-rotate": index % 2 === 0 ? "-1.5deg" : "1deg",
                             zIndex: index + 1,
                           }}
                           onPointerDown={(event) => startDrag(event, item)}
@@ -499,16 +532,23 @@ function NoteCard({
   showActions = true,
 }) {
   return (
-    <button
-      type="button"
+    <article
       className={`note-card ${className}`.trim()}
       data-tone={tone}
       style={style}
-      onPointerDown={onPointerDown}
     >
       <span className="note-pin"></span>
+      <button
+        type="button"
+        className="note-surface"
+        onPointerDown={onPointerDown}
+        aria-label={`Move ${item.title}`}
+      >
+        <span className="note-title">{item.title}</span>
+        <span className="note-meta">{item.source}</span>
+      </button>
       {showActions ? (
-        <span className="note-actions">
+        <div className="note-actions" role="group" aria-label={`Actions for ${item.title}`}>
           <button
             type="button"
             className="note-action-button"
@@ -533,11 +573,19 @@ function NoteCard({
           >
             Delete
           </button>
-        </span>
+        </div>
       ) : null}
-      <span className="note-title">{item.title}</span>
-      <span className="note-meta">{item.source}</span>
-    </button>
+    </article>
+  );
+}
+
+function SummaryCard({ tone, label, value, detail }) {
+  return (
+    <article className="summary-card" data-tone={tone}>
+      <span className="summary-label">{label}</span>
+      <strong className="summary-value">{value}</strong>
+      <span className="summary-detail">{detail}</span>
+    </article>
   );
 }
 
