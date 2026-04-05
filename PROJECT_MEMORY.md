@@ -43,3 +43,44 @@
   Review the latest production version on Render and collect feedback on clarity and interaction feel.
   Decide whether the next product move is accessibility, sharing/export, or backend persistence.
   If portfolio positioning matters, add stronger case-study-ready framing in the README and possibly capture screenshots or demo clips.
+
+### 2026-04-05 11:35 America/New_York
+
+- Feature name, work name, description, and value provided
+  Workflow completion and UI hierarchy refinement. Extended Sorting Fun from intake-and-prioritization into a fuller workflow by adding completion status, a dedicated Completed section, restore behavior, and improved summary-card hierarchy. Value provided: the app now captures work from incoming through completion and communicates the workflow more clearly at a glance.
+
+- Files changed
+  `PROJECT_MEMORY.md`, `src/App.jsx`, `src/styles.css`
+
+- Technical architecture changes or key technical decisions made
+  Added a separate `status` concept for requests so priority and completion remain distinct product concepts.
+  Kept completed work out of the active priority grid and rendered it in a separate lower section so the app does not confuse status with importance.
+  Updated the summary dashboard styling to better distinguish intake, active priority states, and completed work.
+  Simplified the top-of-page structure into a compact workspace header and updated the product title to `Sorting Fun By Doug`.
+
+- Assumptions
+  Completed work should remain visible for quick review but should not compete with active work.
+  Completion should be reversible through a restore action.
+  The workflow is still designed for a single user using local persistence.
+
+- Known limitations
+  Completed work is still only stored locally in the browser.
+  There is no timestamp, archive, or history model for completed items.
+  Completed actions are click-based and there is still no full keyboard-only movement workflow.
+  There is no undo pattern for completion, delete, or reset beyond manual restore where available.
+
+- Key learnings that you can bring with you to future sessions
+  The cleanest way to extend this product is to separate lifecycle state from priority state instead of forcing everything into one board metaphor.
+  The summary area works better when it reflects the true workflow hierarchy rather than treating all counts as equal peers.
+  A calmer, more compact header improved the product feel more than adding more top-of-page explanation.
+
+- Remaining TODOs
+  Consider adding timestamps or metadata for completed items.
+  Explore undo or safer recovery patterns for destructive actions.
+  Add stronger accessibility support for non-pointer users.
+  Decide whether the next workflow extension should be saved sessions/backend support or export/share.
+
+- Next steps
+  Review the latest production version on Render with the completed workflow in place.
+  Decide whether to deepen workflow history, improve accessibility, or add shared persistence next.
+  If the product will be shown publicly, consider adding README/screenshots that explain the full incoming-to-completed workflow.
