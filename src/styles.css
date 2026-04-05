@@ -148,26 +148,68 @@ input {
   border: 1px solid rgba(122, 82, 54, 0.12);
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(14px);
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: rgba(68, 43, 21, 0.08);
 }
 
 .summary-card[data-tone="incoming"] {
-  background: rgba(255, 248, 231, 0.78);
+  background: rgba(255, 249, 237, 0.88);
+}
+
+.summary-card[data-tone="incoming"]::before {
+  background: rgba(184, 139, 44, 0.28);
 }
 
 .summary-card[data-tone="top"] {
-  background: rgba(250, 233, 227, 0.88);
+  background: linear-gradient(180deg, rgba(251, 231, 224, 0.95), rgba(248, 224, 216, 0.92));
+  border-color: rgba(173, 92, 68, 0.16);
+  box-shadow: 0 12px 24px rgba(160, 90, 58, 0.12);
+}
+
+.summary-card[data-tone="top"]::before {
+  background: rgba(201, 86, 56, 0.42);
 }
 
 .summary-card[data-tone="high"] {
   background: rgba(252, 243, 216, 0.88);
 }
 
+.summary-card[data-tone="high"]::before {
+  background: rgba(190, 137, 14, 0.3);
+}
+
 .summary-card[data-tone="medium"] {
   background: rgba(229, 247, 239, 0.9);
 }
 
+.summary-card[data-tone="medium"]::before {
+  background: rgba(35, 122, 85, 0.26);
+}
+
 .summary-card[data-tone="low"] {
   background: rgba(232, 240, 252, 0.9);
+}
+
+.summary-card[data-tone="low"]::before {
+  background: rgba(49, 93, 163, 0.24);
+}
+
+.summary-card[data-tone="completed"] {
+  background: rgba(244, 243, 239, 0.92);
+  border-color: rgba(98, 91, 76, 0.1);
+  box-shadow: 0 8px 18px rgba(68, 43, 21, 0.06);
+}
+
+.summary-card[data-tone="completed"]::before {
+  background: rgba(112, 111, 101, 0.18);
 }
 
 .summary-label,
@@ -186,6 +228,10 @@ input {
   font-family: var(--font-display);
   font-size: 1.75rem;
   line-height: 1;
+}
+
+.summary-card[data-tone="top"] .summary-value {
+  font-size: 2rem;
 }
 
 .summary-detail {
@@ -598,6 +644,13 @@ input {
     var(--note-low);
 }
 
+.note-card[data-tone="completed"] {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 34%),
+    rgba(239, 236, 226, 0.92);
+  box-shadow: 0 12px 20px rgba(68, 43, 21, 0.1);
+}
+
 .note-pin {
   position: absolute;
   top: 10px;
@@ -649,6 +702,15 @@ input {
   background: rgba(158, 61, 37, 0.18);
 }
 
+.note-action-button-complete {
+  background: rgba(35, 122, 85, 0.14);
+  color: #1a6c4d;
+}
+
+.note-action-button-complete:hover {
+  background: rgba(35, 122, 85, 0.22);
+}
+
 .note-title {
   display: block;
   margin-right: 18px;
@@ -666,6 +728,83 @@ input {
   color: rgba(44, 27, 17, 0.58);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.note-status-label {
+  display: block;
+  margin-top: 0.55rem;
+  color: rgba(44, 27, 17, 0.52);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.completed-zone {
+  max-width: 1320px;
+  margin: 1rem auto 0;
+  padding: 1rem 1.1rem 1.15rem;
+  border-radius: 30px;
+  background: rgba(249, 247, 242, 0.5);
+  border: 1px solid rgba(122, 82, 54, 0.09);
+  box-shadow: var(--shadow-sm);
+}
+
+.completed-zone-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.9rem;
+}
+
+.completed-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(68, 43, 21, 0.06);
+  color: rgba(44, 27, 17, 0.75);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.completed-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.completed-card {
+  position: relative;
+  left: auto;
+  right: auto;
+  inset: auto;
+  min-height: 120px;
+}
+
+.completed-card,
+.completed-card .note-surface {
+  cursor: default;
+}
+
+.completed-empty {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.2rem 0.4rem 0.2rem;
+  color: var(--muted);
+}
+
+.completed-empty-title,
+.completed-empty-copy {
+  margin: 0;
+}
+
+.completed-empty-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--ink);
 }
 
 .hand-layer {
@@ -771,6 +910,10 @@ input {
   .incoming-stack {
     min-height: 520px;
   }
+
+  .completed-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -806,6 +949,15 @@ input {
 
   .incoming-stack {
     min-height: 430px;
+  }
+
+  .completed-zone-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .completed-list {
+    grid-template-columns: 1fr;
   }
 
   .note-card {

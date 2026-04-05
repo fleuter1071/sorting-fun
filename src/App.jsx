@@ -8,30 +8,35 @@ const initialRequests = [
     title: "Fix onboarding drop-off for first-time users",
     source: "Growth team",
     priority: null,
+    status: "active",
   },
   {
     id: "req-2",
     title: "Review customer escalation on billing confusion",
     source: "Support",
     priority: null,
+    status: "active",
   },
   {
     id: "req-3",
     title: "Scope lightweight analytics dashboard refresh",
     source: "Product",
     priority: null,
+    status: "active",
   },
   {
     id: "req-4",
     title: "Tidy stale help-center screenshots",
     source: "Marketing",
     priority: null,
+    status: "active",
   },
   {
     id: "req-5",
     title: "Plan partner launch checklist for next quarter",
     source: "Partnerships",
     priority: null,
+    status: "active",
   },
 ];
 
@@ -142,11 +147,14 @@ function App() {
     window.localStorage.setItem(storageKey, JSON.stringify(items));
   }, [items]);
 
-  const unsorted = items.filter((item) => !item.priority);
-  const topCount = items.filter((item) => item.priority === "top").length;
-  const highCount = items.filter((item) => item.priority === "high").length;
-  const mediumCount = items.filter((item) => item.priority === "medium").length;
-  const lowCount = items.filter((item) => item.priority === "low").length;
+  const activeItems = items.filter((item) => item.status !== "completed");
+  const completedItems = items.filter((item) => item.status === "completed");
+  const unsorted = activeItems.filter((item) => !item.priority);
+  const topCount = activeItems.filter((item) => item.priority === "top").length;
+  const highCount = activeItems.filter((item) => item.priority === "high").length;
+  const mediumCount = activeItems.filter((item) => item.priority === "medium").length;
+  const lowCount = activeItems.filter((item) => item.priority === "low").length;
+  const completedCount = completedItems.length;
 
   function startDrag(event, item) {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -210,6 +218,7 @@ function App() {
           title,
           source,
           priority: null,
+          status: "active",
         },
         ...current,
       ]);
@@ -243,6 +252,36 @@ function App() {
     if (editingId === itemId) {
       cancelEditing();
     }
+  }
+
+  function completeRequest(itemId) {
+    setItems((current) =>
+      current.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              status: "completed",
+            }
+          : item
+      )
+    );
+
+    if (editingId === itemId) {
+      cancelEditing();
+    }
+  }
+
+  function restoreRequest(itemId) {
+    setItems((current) =>
+      current.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              status: "active",
+            }
+          : item
+      )
+    );
   }
 
   return (
@@ -351,6 +390,12 @@ function App() {
               value={lowCount}
               detail="Backlog ideas"
             />
+            <SummaryCard
+              tone="completed"
+              label="Completed"
+              value={completedCount}
+              detail="Finished work"
+            />
           </section>
         </section>
 
@@ -378,6 +423,8 @@ function App() {
                     onPointerDown={(event) => startDrag(event, item)}
                     onEdit={() => startEditing(item)}
                     onDelete={() => deleteRequest(item.id)}
+                    onComplete={() => completeRequest(item.id)}
+                    showComplete={false}
                   />
                 );
               })}
@@ -386,7 +433,9 @@ function App() {
 
           <section className="pile-grid" aria-label="Priority piles">
             {priorities.map((priority) => {
-              const pileItems = items.filter((item) => item.priority === priority.key);
+              const pileItems = activeItems.filter(
+                (item) => item.priority === priority.key
+              );
               const isActive = activeTarget === priority.key;
 
               return (
@@ -430,6 +479,7 @@ function App() {
                           onPointerDown={(event) => startDrag(event, item)}
                           onEdit={() => startEditing(item)}
                           onDelete={() => deleteRequest(item.id)}
+                          onComplete={() => completeRequest(item.id)}
                         />
                       );
                     })}
@@ -439,6 +489,49 @@ function App() {
             })}
           </section>
         </main>
+
+        <section className="completed-zone" aria-label="Completed requests">
+          <div className="completed-zone-header">
+            <div>
+              <p className="section-label">Completed</p>
+              <p className="section-subtle">
+                Finished work stays here for quick review without crowding the active
+                board.
+              </p>
+            </div>
+            <span className="completed-count">{completedCount}</span>
+          </div>
+
+          {completedItems.length ? (
+            <div className="completed-list">
+              {completedItems.map((item, index) => (
+                <NoteCard
+                  key={item.id}
+                  item={item}
+                  tone="completed"
+                  className="completed-card"
+                  style={{
+                    "--card-rotate": index % 2 === 0 ? "-0.6deg" : "0.4deg",
+                  }}
+                  onEdit={() => startEditing(item)}
+                  onDelete={() => deleteRequest(item.id)}
+                  onRestore={() => restoreRequest(item.id)}
+                  showComplete={false}
+                  dragEnabled={false}
+                  statusLabel={priorityLabel(item.priority)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="completed-empty">
+              <p className="completed-empty-title">Nothing completed yet.</p>
+              <p className="completed-empty-copy">
+                Completed requests will appear here after you finish them from one of
+                the active priority piles.
+              </p>
+            </div>
+          )}
+        </section>
       </div>
 
       <div
@@ -512,6 +605,9 @@ function isValidItem(item) {
     typeof item.id === "string" &&
     typeof item.title === "string" &&
     typeof item.source === "string" &&
+    (item.status === undefined ||
+      item.status === "active" ||
+      item.status === "completed") &&
     (item.priority === null ||
       priorities.some((priority) => priority.key === item.priority))
   );
@@ -529,7 +625,12 @@ function NoteCard({
   onPointerDown,
   onEdit,
   onDelete,
+  onComplete,
+  onRestore,
   showActions = true,
+  showComplete = true,
+  dragEnabled = true,
+  statusLabel,
 }) {
   return (
     <article
@@ -541,14 +642,43 @@ function NoteCard({
       <button
         type="button"
         className="note-surface"
-        onPointerDown={onPointerDown}
-        aria-label={`Move ${item.title}`}
+        onPointerDown={dragEnabled ? onPointerDown : undefined}
+        aria-label={dragEnabled ? `Move ${item.title}` : item.title}
       >
         <span className="note-title">{item.title}</span>
         <span className="note-meta">{item.source}</span>
+        {statusLabel ? <span className="note-status-label">{statusLabel}</span> : null}
       </button>
       {showActions ? (
         <div className="note-actions" role="group" aria-label={`Actions for ${item.title}`}>
+          {showComplete ? (
+            <button
+              type="button"
+              className="note-action-button note-action-button-complete"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                onComplete?.();
+              }}
+              aria-label={`Complete ${item.title}`}
+            >
+              Complete
+            </button>
+          ) : null}
+          {onRestore ? (
+            <button
+              type="button"
+              className="note-action-button"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                onRestore?.();
+              }}
+              aria-label={`Restore ${item.title}`}
+            >
+              Restore
+            </button>
+          ) : null}
           <button
             type="button"
             className="note-action-button"
@@ -587,6 +717,15 @@ function SummaryCard({ tone, label, value, detail }) {
       <span className="summary-detail">{detail}</span>
     </article>
   );
+}
+
+function priorityLabel(priority) {
+  if (!priority) {
+    return "Completed from incoming";
+  }
+
+  const match = priorities.find((item) => item.key === priority);
+  return `Completed from ${match?.title ?? priority}`;
 }
 
 function findDropzone(pointer, refs) {
