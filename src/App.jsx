@@ -372,37 +372,31 @@ function App() {
                   tone="incoming"
                   label="Waiting to sort"
                   value={unsorted.length}
-                  detail="New requests still in the stack"
                 />
                 <SummaryCard
                   tone="top"
                   label="Top priority"
                   value={topCount}
-                  detail="Immediate work"
                 />
                 <SummaryCard
                   tone="high"
                   label="High priority"
                   value={highCount}
-                  detail="Needs attention soon"
                 />
                 <SummaryCard
                   tone="medium"
                   label="Medium priority"
                   value={mediumCount}
-                  detail="Planned work"
                 />
                 <SummaryCard
                   tone="low"
                   label="Low priority"
                   value={lowCount}
-                  detail="Backlog ideas"
                 />
                 <SummaryCard
                   tone="completed"
                   label="Completed"
                   value={completedCount}
-                  detail="Finished work"
                 />
               </section>
             </aside>
@@ -724,7 +718,7 @@ function SummaryCard({ tone, label, value, detail }) {
     <article className="summary-card" data-tone={tone}>
       <span className="summary-label">{label}</span>
       <strong className="summary-value">{value}</strong>
-      <span className="summary-detail">{detail}</span>
+      {detail ? <span className="summary-detail">{detail}</span> : null}
     </article>
   );
 }
