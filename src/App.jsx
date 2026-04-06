@@ -302,101 +302,115 @@ function App() {
         </header>
 
         <section className="workspace-band" aria-label="Board controls and summary">
-          <form className="composer" onSubmit={handleCreateRequest}>
-            <div className="composer-head">
-              <div className="composer-copy">
-                <p className="composer-kicker">
-                  {editingId ? "Editing note" : "Add request"}
-                </p>
-                <p className="composer-title">
-                  {editingId ? "Update the request and keep sorting" : "Capture the next piece of work"}
-                </p>
-                <p className="composer-subtle">
-                  {editingId
-                    ? "Save the update, then place the note back into the right pile."
-                    : "Enter the request here. It will appear in the incoming stack ready to sort."}
+          <div className="workspace-band-shell">
+            <form className="composer" onSubmit={handleCreateRequest}>
+              <div className="composer-head">
+                <div className="composer-copy">
+                  <p className="composer-kicker">
+                    {editingId ? "Editing note" : "Add request"}
+                  </p>
+                  <p className="composer-title">
+                    {editingId
+                      ? "Update the request and keep sorting"
+                      : "Capture the next piece of work"}
+                  </p>
+                  <p className="composer-subtle">
+                    {editingId
+                      ? "Save the update, then place the note back into the right pile."
+                      : "Enter the request here. It will appear in the incoming stack ready to sort."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="composer-fields">
+                <label className="composer-field">
+                  <span>Request</span>
+                  <input
+                    type="text"
+                    name="title"
+                    value={draft.title}
+                    onChange={handleDraftChange}
+                    placeholder="Ex: Investigate spike in churn"
+                  />
+                </label>
+
+                <label className="composer-field">
+                  <span>Source</span>
+                  <input
+                    type="text"
+                    name="source"
+                    value={draft.source}
+                    onChange={handleDraftChange}
+                    placeholder="Ex: Customer success"
+                  />
+                </label>
+              </div>
+
+              <div className="composer-actions">
+                <button type="submit" className="primary-button">
+                  {editingId ? "Save changes" : "Add request"}
+                </button>
+                {editingId ? (
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={cancelEditing}
+                  >
+                    Cancel
+                  </button>
+                ) : null}
+              </div>
+            </form>
+
+            <aside className="summary-panel" aria-label="Board snapshot">
+              <div className="summary-panel-head">
+                <p className="composer-kicker">Board snapshot</p>
+                <p className="summary-panel-copy">
+                  Keep one quick read on intake, active priorities, and finished
+                  work without pulling focus from the board.
                 </p>
               </div>
-            </div>
 
-            <div className="composer-fields">
-              <label className="composer-field">
-                <span>Request</span>
-                <input
-                  type="text"
-                  name="title"
-                  value={draft.title}
-                  onChange={handleDraftChange}
-                  placeholder="Ex: Investigate spike in churn"
+              <section className="board-summary" aria-label="Board summary">
+                <SummaryCard
+                  tone="incoming"
+                  label="Waiting to sort"
+                  value={unsorted.length}
+                  detail="New requests still in the stack"
                 />
-              </label>
-
-              <label className="composer-field">
-                <span>Source</span>
-                <input
-                  type="text"
-                  name="source"
-                  value={draft.source}
-                  onChange={handleDraftChange}
-                  placeholder="Ex: Customer success"
+                <SummaryCard
+                  tone="top"
+                  label="Top priority"
+                  value={topCount}
+                  detail="Immediate work"
                 />
-              </label>
-            </div>
-
-            <div className="composer-actions">
-              <button type="submit" className="primary-button">
-                {editingId ? "Save changes" : "Add request"}
-              </button>
-              {editingId ? (
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={cancelEditing}
-                >
-                  Cancel
-                </button>
-              ) : null}
-            </div>
-          </form>
-
-          <section className="board-summary" aria-label="Board summary">
-            <SummaryCard
-              tone="incoming"
-              label="Waiting to sort"
-              value={unsorted.length}
-              detail="New requests still in the stack"
-            />
-            <SummaryCard
-              tone="top"
-              label="Top priority"
-              value={topCount}
-              detail="Immediate work"
-            />
-            <SummaryCard
-              tone="high"
-              label="High priority"
-              value={highCount}
-              detail="Needs attention soon"
-            />
-            <SummaryCard
-              tone="medium"
-              label="Medium priority"
-              value={mediumCount}
-              detail="Planned work"
-            />
-            <SummaryCard
-              tone="low"
-              label="Low priority"
-              value={lowCount}
-              detail="Backlog ideas"
-            />
-            <SummaryCard
-              tone="completed"
-              label="Completed"
-              value={completedCount}
-              detail="Finished work"
-            />
-          </section>
+                <SummaryCard
+                  tone="high"
+                  label="High priority"
+                  value={highCount}
+                  detail="Needs attention soon"
+                />
+                <SummaryCard
+                  tone="medium"
+                  label="Medium priority"
+                  value={mediumCount}
+                  detail="Planned work"
+                />
+                <SummaryCard
+                  tone="low"
+                  label="Low priority"
+                  value={lowCount}
+                  detail="Backlog ideas"
+                />
+                <SummaryCard
+                  tone="completed"
+                  label="Completed"
+                  value={completedCount}
+                  detail="Finished work"
+                />
+              </section>
+            </aside>
+          </div>
         </section>
 
         <main className="board" aria-label="Request sorting board">

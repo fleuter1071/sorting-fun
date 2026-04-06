@@ -73,7 +73,7 @@ input {
   gap: 1rem;
   align-items: start;
   max-width: 1320px;
-  margin: 0 auto 1rem;
+  margin: 0 auto 0.75rem;
 }
 
 .eyebrow,
@@ -124,12 +124,42 @@ input {
 }
 
 .workspace-band {
-  display: grid;
-  grid-template-columns: minmax(360px, 1.2fr) minmax(0, 1fr);
-  gap: 1rem;
   max-width: 1320px;
   margin: 0 auto 1rem;
-  align-items: stretch;
+}
+
+.workspace-band-shell {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.15fr) minmax(320px, 0.95fr);
+  gap: 1.2rem;
+  align-items: start;
+  padding: 1.1rem 1.15rem;
+  border-radius: 34px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 243, 0.88), rgba(248, 239, 225, 0.8));
+  border: 1px solid rgba(122, 82, 54, 0.13);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
+}
+
+.summary-panel {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+  padding: 0.3rem 0.15rem 0.15rem 0.2rem;
+}
+
+.summary-panel-head {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.summary-panel-copy {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .board-summary {
@@ -144,9 +174,9 @@ input {
   gap: 0.15rem;
   padding: 0.95rem 1rem;
   border-radius: 22px;
-  background: rgba(255, 250, 242, 0.62);
+  background: rgba(255, 250, 242, 0.74);
   border: 1px solid rgba(122, 82, 54, 0.12);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 10px 22px rgba(35, 20, 10, 0.08);
   backdrop-filter: blur(14px);
   position: relative;
   overflow: hidden;
@@ -203,9 +233,9 @@ input {
 }
 
 .summary-card[data-tone="completed"] {
-  background: rgba(244, 243, 239, 0.92);
+  background: rgba(246, 244, 240, 0.9);
   border-color: rgba(98, 91, 76, 0.1);
-  box-shadow: 0 8px 18px rgba(68, 43, 21, 0.06);
+  box-shadow: 0 6px 14px rgba(68, 43, 21, 0.04);
 }
 
 .summary-card[data-tone="completed"]::before {
@@ -262,8 +292,8 @@ input {
 
 .board {
   display: grid;
-  grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
-  gap: var(--space-5);
+  grid-template-columns: minmax(340px, 390px) minmax(0, 1fr);
+  gap: 1.7rem;
   max-width: 1320px;
   margin: 0 auto;
   padding: clamp(1.1rem, 2vw, 1.8rem);
@@ -301,12 +331,11 @@ input {
 .composer {
   display: grid;
   gap: 1rem;
-  padding: 1.1rem 1.15rem;
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(255, 252, 246, 0.9), rgba(247, 237, 220, 0.84));
-  border: 1px solid rgba(122, 82, 54, 0.14);
-  box-shadow: var(--shadow-sm);
+  padding: 0.35rem;
+  border-radius: 24px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .composer-head {
@@ -393,13 +422,15 @@ input {
 }
 
 .incoming-stack {
-  min-height: 680px;
+  min-height: 700px;
   padding: var(--space-4);
   border-radius: calc(var(--radius-xl) + 4px);
   background:
     linear-gradient(180deg, rgba(255, 252, 247, 0.86), rgba(244, 231, 214, 0.84));
   border: 1px solid var(--line);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 22px 42px rgba(78, 47, 25, 0.12);
   position: relative;
   overflow: hidden;
 }
@@ -424,9 +455,9 @@ input {
   min-height: 320px;
   padding: var(--space-4);
   border-radius: var(--radius-xl);
-  background: var(--panel);
+  background: rgba(255, 248, 238, 0.84);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 14px 28px rgba(35, 20, 10, 0.1);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -449,7 +480,7 @@ input {
 
 .pile.active-target {
   transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 28px 56px rgba(35, 20, 10, 0.2);
+  box-shadow: 0 22px 42px rgba(35, 20, 10, 0.16);
 }
 
 .pile[data-priority="top"].active-target {
@@ -525,12 +556,13 @@ input {
   position: relative;
   flex: 1;
   border-radius: var(--radius-lg);
-  border: 1px dashed rgba(67, 42, 24, 0.12);
+  border: 1px dashed rgba(67, 42, 24, 0.09);
   padding: var(--space-3);
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
   min-height: 180px;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .pile-dropzone::before {
@@ -646,9 +678,9 @@ input {
 
 .note-card[data-tone="completed"] {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 34%),
-    rgba(239, 236, 226, 0.92);
-  box-shadow: 0 12px 20px rgba(68, 43, 21, 0.1);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 34%),
+    rgba(241, 238, 231, 0.96);
+  box-shadow: 0 7px 14px rgba(68, 43, 21, 0.06);
 }
 
 .note-pin {
@@ -740,12 +772,12 @@ input {
 
 .completed-zone {
   max-width: 1320px;
-  margin: 1rem auto 0;
-  padding: 1rem 1.1rem 1.15rem;
+  margin: 0.8rem auto 0;
+  padding: 0.95rem 1.1rem 1rem;
   border-radius: 30px;
-  background: rgba(249, 247, 242, 0.5);
-  border: 1px solid rgba(122, 82, 54, 0.09);
-  box-shadow: var(--shadow-sm);
+  background: rgba(250, 248, 243, 0.36);
+  border: 1px solid rgba(122, 82, 54, 0.07);
+  box-shadow: 0 6px 16px rgba(68, 43, 21, 0.04);
 }
 
 .completed-zone-header {
@@ -773,7 +805,7 @@ input {
 .completed-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: 0.75rem;
 }
 
 .completed-card {
@@ -781,12 +813,26 @@ input {
   left: auto;
   right: auto;
   inset: auto;
-  min-height: 120px;
+  min-height: 110px;
 }
 
 .completed-card,
 .completed-card .note-surface {
   cursor: default;
+}
+
+.completed-card .note-surface {
+  min-height: 110px;
+  padding-bottom: 0.8rem;
+}
+
+.completed-card .note-title {
+  font-size: 0.98rem;
+}
+
+.completed-card .note-meta,
+.completed-card .note-status-label {
+  color: rgba(44, 27, 17, 0.5);
 }
 
 .completed-empty {
@@ -894,7 +940,7 @@ input {
 }
 
 @media (max-width: 1024px) {
-  .workspace-band {
+  .workspace-band-shell {
     grid-template-columns: 1fr;
   }
 
@@ -928,6 +974,10 @@ input {
 
   .board-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workspace-band-shell {
+    padding: 0.95rem;
   }
 
   .composer-fields {
