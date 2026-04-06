@@ -365,10 +365,6 @@ function App() {
             <aside className="summary-panel" aria-label="Board snapshot">
               <div className="summary-panel-head">
                 <p className="composer-kicker">Board snapshot</p>
-                <p className="summary-panel-copy">
-                  Keep one quick read on intake, active priorities, and finished
-                  work without pulling focus from the board.
-                </p>
               </div>
 
               <section className="board-summary" aria-label="Board summary">
