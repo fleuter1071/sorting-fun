@@ -84,3 +84,42 @@
   Review the latest production version on Render with the completed workflow in place.
   Decide whether to deepen workflow history, improve accessibility, or add shared persistence next.
   If the product will be shown publicly, consider adding README/screenshots that explain the full incoming-to-completed workflow.
+
+### 2026-04-08 15:20 America/New_York
+
+- Feature name, work name, description, and value provided
+  Top control-area tightening and snapshot compression polish. Refined the top of Sorting Fun to reduce excess whitespace, reintroduced clearer internal boundaries between the Add Request composer and the Board Snapshot module, removed extra explanatory copy from the snapshot panel, and removed the per-metric helper text so the summary area is shorter and faster to scan. Value provided: the page now feels more like a working tool and less like a presentation surface, with quicker visual access to the board.
+
+- Files changed
+  `PROJECT_MEMORY.md`, `src/App.jsx`, `src/styles.css`
+
+- Technical architecture changes or key technical decisions made
+  Treated the issue as a UI structure problem rather than a logic problem, so all changes stayed in the frontend presentation layer.
+  Reduced global top padding and tightened header spacing so the board appears sooner on page load.
+  Gave the composer and summary their own internal panel surfaces again so empty space would not read as part of the Add Request module.
+  Simplified the snapshot metrics to label-plus-value only, making the summary panel more compact and more dashboard-like in the right way.
+
+- Assumptions
+  Users understand the meaning of the six snapshot metrics without needing a secondary explainer line under each one.
+  The top area should support the board, not compete with it.
+  Preserving the existing workflow and state model was more important than introducing any new interactions.
+
+- Known limitations
+  The summary panel is still a compact card grid rather than a more deeply restructured workflow summary.
+  The product still lacks automated UI regression tests, so visual polish changes rely on manual review plus build verification.
+  Responsive appearance across all device sizes still depends on manual spot-checking rather than a formal visual QA suite.
+
+- Key learnings that you can bring with you to future sessions
+  When a module feels too empty, the best fix is often clearer boundaries rather than simply reducing padding.
+  Summary views become easier to scan when labels and counts carry the meaning directly and helper text is removed.
+  Small spacing and copy reductions at the top of the page can materially change whether a product feels like a tool or a showcase.
+
+- Remaining TODOs
+  Continue reviewing the live Render build for any remaining whitespace or hierarchy issues in the top area.
+  Consider whether the snapshot section should eventually separate intake from active priorities even more clearly.
+  Add a lightweight QA or screenshot-based review habit for future visual-only releases.
+
+- Next steps
+  Review the latest production build on Render to confirm the tighter top area feels balanced on desktop and mobile.
+  Decide whether the next design step should focus on the summary structure, board motion polish, or accessibility improvements.
+  If future polish work continues, consider documenting a small design-system checklist for spacing, hierarchy, and module boundaries.
